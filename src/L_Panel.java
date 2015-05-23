@@ -1,7 +1,6 @@
 import java.awt.*;
 import java.io.File;
 import java.util.*;
-import java.lang.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -104,4 +103,5 @@ class L_Panel extends JPanel {
 	public File[] getFile() {
 		return dir_toR;
 	}
+	
 }

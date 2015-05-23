@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.io.File;
-import java.util.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -20,8 +19,7 @@ import javax.swing.tree.*;
  */
 class IView_Frame extends JFrame implements TreeWillExpandListener {
 	private JSplitPane jsp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-
-	Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+	private Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 	
 	L_Panel lpl = new L_Panel();
 	R_Panel rpl = new R_Panel();
@@ -41,17 +39,16 @@ class IView_Frame extends JFrame implements TreeWillExpandListener {
 		this.setVisible(true);
 	}
 	
-	public void init() {
-		Container con = this.getContentPane();
-		con.setLayout(new BorderLayout());
+	private void init() {
+		this.setLayout(new BorderLayout());
 		jsp.setLeftComponent(lpl);
 		jsp.setRightComponent(rpl);
 		jsp.setOneTouchExpandable(true);
 		jsp.setResizeWeight(0.278);
-		con.add("Center", jsp);
+		this.add("Center", jsp);
 	}
 	
-	public void start() {
+	private void start() {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.getEvent();
 	}
@@ -79,10 +76,11 @@ class IView_Frame extends JFrame implements TreeWillExpandListener {
 public class IView {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		IView_Frame frm = new IView_Frame("IView");
+		new IView_Frame("IView");
 	}
 }
 
+// Error!
 class Error_Frame extends JDialog {
 	private JLabel lbl = new JLabel("       접근할 수 없는 파일입니다");
 	public Error_Frame() {
