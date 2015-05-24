@@ -26,6 +26,17 @@ import javax.swing.JPanel;
 				xlen = 105 * image.getWidth()/image.getHeight();
 				ylen = 105;
 			}
+			else {
+				if(image.getWidth() >= image.getHeight()) {
+					xlen = 250;
+					ylen = 230;// * image.getHeight() / image.getWidth();
+				}
+				
+				else {
+					xlen = 250;// * image.getWidth() / image.getHeight();
+					ylen = 230;
+				}
+			}
 			this.addMouseListener(this);
 		}
 		
@@ -41,9 +52,9 @@ import javax.swing.JPanel;
 		}
 		
 		@Override
-		public void mouseClicked(MouseEvent arg0) {
+		public void mouseClicked(MouseEvent e) {
 			// TODO Auto-generated method stub
-			System.out.println(ref);
+			IView_Frame.getClickSignal(ref);
 			
 		}
 		

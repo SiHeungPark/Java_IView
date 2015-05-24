@@ -21,8 +21,8 @@ class IView_Frame extends JFrame implements TreeWillExpandListener {
 	private JSplitPane jsp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 	private Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 	
-	L_Panel lpl = new L_Panel();
-	R_Panel rpl = new R_Panel();
+	static L_Panel lpl = new L_Panel();
+	static R_Panel rpl = new R_Panel();
 	
 	public IView_Frame(String title) {
 		super(title);
@@ -40,12 +40,14 @@ class IView_Frame extends JFrame implements TreeWillExpandListener {
 	}
 	
 	private void init() {
+
 		this.setLayout(new BorderLayout());
 		jsp.setLeftComponent(lpl);
 		jsp.setRightComponent(rpl);
 		jsp.setOneTouchExpandable(true);
-		jsp.setResizeWeight(0.278);
+		jsp.setResizeWeight(0.274);
 		this.add("Center", jsp);
+		
 	}
 	
 	private void start() {
@@ -56,10 +58,13 @@ class IView_Frame extends JFrame implements TreeWillExpandListener {
 	@Override
 	public void treeWillExpand(TreeExpansionEvent e)
 			throws ExpandVetoException {
+		long start = System.currentTimeMillis();
 		rpl.dataRemove();
 		lpl.getEvent(e);
 		File[] tmp = lpl.getFile();
 		rpl.setTable(tmp);
+		long end = System.currentTimeMillis();
+		System.out.println("실행 시간 : " + (end - start) / 1000.0);
 	}
 
 	@Override
@@ -69,6 +74,10 @@ class IView_Frame extends JFrame implements TreeWillExpandListener {
 	
 	public void getEvent() {
 		lpl.addTree(this);
+	}
+	
+	public static void getClickSignal(String str){
+		lpl.showPic(str);
 	}
 }
 

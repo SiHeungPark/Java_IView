@@ -28,7 +28,28 @@ class L_Panel extends JPanel {
 	
 	// pl will be PictureBox
 	private JPanel pl= new JPanel();
-	private JLabel lbl = new JLabel("PICTURE BOX");
+	private JSplitPane jsp = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+	
+	public L_Panel() {
+		this.setLayout(new BorderLayout());
+		
+		for(int i = 0; i<dir.length; ++i) {
+			DefaultMutableTreeNode tmp = 
+					new DefaultMutableTreeNode(dir[i].toString());
+			DefaultMutableTreeNode tmp1 = 
+					new DefaultMutableTreeNode("");
+			tmp.add(tmp1);
+			root.add(tmp);
+		}
+		
+		tree_jsp.setPreferredSize(new Dimension(250,350));
+		pl.setPreferredSize(new Dimension(250,250));
+		
+		jsp.setLeftComponent(tree_jsp);
+		jsp.setRightComponent(pl);
+		jsp.setResizeWeight(0.5833);
+		this.add("Center", jsp);
+	}
 	
 	private String getPos(TreePath tp) {
 		StringBuffer tmp = new StringBuffer(tp.toString());
@@ -44,26 +65,10 @@ class L_Panel extends JPanel {
 		return str;
 	}
 	
-	public L_Panel() {
-		this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
-		
-		for(int i = 0; i<dir.length; ++i) {
-			DefaultMutableTreeNode tmp = 
-					new DefaultMutableTreeNode(dir[i].toString());
-			DefaultMutableTreeNode tmp1 = 
-					new DefaultMutableTreeNode("");
-			tmp.add(tmp1);
-			root.add(tmp);
-		}
-		
-		tree_jsp.setPreferredSize(new Dimension(250,350));
-		lbl.setPreferredSize(new Dimension(250,250));
-						
-		this.add(tree_jsp);
-		this.add(lbl);
-	}
 	
 	public void getEvent(TreeExpansionEvent e) {
+		pl.removeAll();
+		jsp.setRightComponent(pl);
 		if(e.getSource() == tree) {
 			tree.setSelectionPath(e.getPath());
 			String pos = this.getPos(e.getPath());
@@ -104,4 +109,10 @@ class L_Panel extends JPanel {
 		return dir_toR;
 	}
 	
+	public void showPic(String str) {
+		pl.removeAll();
+		pl.setLayout(new GridLayout(1,1));
+		pl.add(new PicCtrl(str, false));
+		jsp.setRightComponent(pl);
+	}
 }
