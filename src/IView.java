@@ -63,9 +63,10 @@ class IView_Frame extends JFrame implements TreeWillExpandListener {
 	private void start() {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.getEvent();
-		this.makeFolder();
+		//this.makeFolder();
 	}
 	
+	/*
 	private void makeFolder() {
 		File thumbFolder = new File("IView");
 		if(!thumbFolder.exists()) {
@@ -77,6 +78,7 @@ class IView_Frame extends JFrame implements TreeWillExpandListener {
 		}
 		thumbRoot = new String(thumbFolder.getAbsolutePath());
 	}
+	*/
 
 	@Override
 	public void treeWillExpand(TreeExpansionEvent e)
@@ -102,8 +104,11 @@ class IView_Frame extends JFrame implements TreeWillExpandListener {
 		lpl.addTree(this);
 	}
 	
-	public static void getClickSignal(String str){
+	public static void getShowSignal(String str){
 		lpl.showPic(str);
+	}
+	public static void getShowSignal(int num) {
+		for(int i = 0 ; i < num ; i++) rpl.showPic(i);
 	}
 }
 
@@ -111,10 +116,17 @@ class IView_Frame extends JFrame implements TreeWillExpandListener {
 public class IView extends Thread{
 	public static ArrayList <String> thumbroot = 
 			new ArrayList <String> ();
+	
+	public static ArrayList <String> thumbworklist = 
+			new ArrayList <String> ();
+	
 	public static ArrayList <String> list = 
 			new ArrayList <String> ();
+	
 	public static boolean thumbworked = false;
 	public static boolean recursioncall = false;
+	
+	private int outputready = 0;
 	
 	// Thread 1
 	private void main_program() {
@@ -129,8 +141,25 @@ public class IView extends Thread{
 				Thread.sleep(200);
 				if(thumbworked) {
 					for (int i  = 0; i < list.size() ; i++) {
-						int n = list.get(list.size() - 1).lastIndexOf(File.separator);
-						makethumbnail(list.get(i), thumbroot.get(i));
+						makethumbnail(list.get(i), thumbworklist.get(i));
+						thumbworklist.set(i, "None");
+						
+						// Decide to show Preview image
+						switch (outputready) {
+							case 0:
+								for(int j = 0 ; j < 5 - thumbworklist.size()%5 ; j++) {
+									if (thumbworklist.get(i).equals("None")) outputready = 1;
+									else {
+										outputready = 0;
+										break;
+									}
+								}
+								
+							case 1:
+								IView_Frame.getShowSignal(5 - thumbworklist.size()%5);
+								outputready = 2;
+								break;
+						}
 					}
 					thumbworked = false;
 				} 
@@ -142,14 +171,13 @@ public class IView extends Thread{
 	 * [[ Make Thumbnail Images ]]
 	 * store thumbnail image in .thumbnail_IView folder
 	 * and save it's AbsolutePath in thumbroot(for pic_prev)
-	 * 
 	 */
 	private void makethumbnail(String ori_path, String thumb_path) {
 		
+		if (thumb_path.equals("None")) return;
+		
 		File ori_name = new File(ori_path);
 		File thumb_name = new File(thumb_path);
-		
-		System.out.println(ori_path + "\n" + thumb_path + "\n");
 		
 		try {
 			BufferedImage buf_ori_img = ImageIO.read(ori_name);
@@ -158,13 +186,15 @@ public class IView extends Thread{
 			Graphics2D graphic = buf_thumb_img.createGraphics();
 			graphic.drawImage(buf_ori_img, 0, 0, 100,100,null);
 			ImageIO.write(buf_thumb_img,  "jpg",  thumb_name);
-		} catch (IOException e){ };
+		} catch (IndexOutOfBoundsException | IOException e){ };
 		
 		// Recursion (if try to index another directory during make thumbnails)
 		if(recursioncall) {
 			//this.makethumbnail();
 			recursioncall = false;
 		}
+		
+		
 	}
 	
 	@Override

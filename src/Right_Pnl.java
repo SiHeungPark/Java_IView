@@ -27,6 +27,7 @@ public class Right_Pnl extends JPanel{
 	private JButton btn_prev = new JButton("¢¸");
 	private JButton btn_next = new JButton("¢º");
 	private JPanel pic_prev = new JPanel();
+	private int prev_index = 0;
 	
 	// JTable DS
 	private Vector header = new Vector();
@@ -50,7 +51,7 @@ public class Right_Pnl extends JPanel{
 		table.getColumnModel().getColumn(2).setPreferredWidth(100);
 		
 		// set Picture mini preview
-		pnl_pic.setPreferredSize(new Dimension(650,150));
+		//pnl_pic.setPreferredSize(new Dimension(650,150));
 		pnl_pic.add("West", btn_prev);
 		pnl_pic.add("Center", pic_prev);
 		pnl_pic.add("East", btn_next);
@@ -64,14 +65,16 @@ public class Right_Pnl extends JPanel{
 	public void setTable(File[] ff) {
 		if(ff == null) return;
 		String root = ff[1].getAbsolutePath().substring(0, ff[1].getAbsolutePath().lastIndexOf(File.separator));
-		
+				
 		// thumbnail Folder exist?
 		boolean thumbexist = false;
-		for (int i = 0;i<ff.length;++i) 
-			if(ff[i].isDirectory()) 
-				if(ff[i].getName() == ".thumbnailIView") 
+		for (int i = 0;i<ff.length;++i) {
+			if(ff[i].isDirectory()) {
+				if(ff[i].getName().equals("_thumbnail_IView")) {
 					thumbexist = true;
-		
+				}
+			}
+		}
 		// set data 
 		for (int i = 0;i<ff.length;++i) {
 			if(ff[i].isFile()) {
@@ -89,26 +92,39 @@ public class Right_Pnl extends JPanel{
 				   extension.equals("png") || extension.equals("PNG")) {
 					
 					IView.list.add(ff[i].getAbsolutePath());
+					String tmp = new String(root + File.separator + "_thumbnail_IView");
+					File f = new File(tmp);
 					
-					
-					
-					if(true) {
+					//int tmp = IView.list.get(IView.list.size() - 1).lastIndexOf(File.separator);
+					String temp = tmp + File.separator + ff[i].getName();
+										
+					if(thumbexist) {
 						// Synchronization between this.Folder and thumbnail_Folder
-						File f = new File(root + File.separator + "_thumbnail_IView");
 						File[] thumbf = f.listFiles();
-						for (int x = 0 ; x < thumbf.length ; ++x) {
-							if(ff[i].getName().equals(thumbf[x].getName())) 
-								IView.thumbroot.add(thumbf[x].getAbsolutePath());
-							else {
-								int tmp = IView.list.get(IView.list.size() - 1).lastIndexOf(File.separator);
-								IView.thumbroot.add(IView.list.get(IView.list.size() - 1).substring(0, tmp) + File.separator + "_thumbnail_IView" + File.separator + ff[i].getName());
-								IView.thumbworked = true;
+						boolean exist = true;
+						int x = 0;
+						for ( ; x < thumbf.length ; ++x) {
+							if(thumbf[x].isFile()) {
+								if(ff[i].getName().equals(thumbf[x].getName())) {
+									IView.thumbroot.add(thumbf[x].getAbsolutePath());
+									IView.thumbworklist.add("None");
+									exist = false;
+									break;
+								}
 							}
+						}
+						if(exist) {
+							IView.thumbworklist.add(temp);
+							IView.thumbroot.add(temp);
+							IView.thumbworked = true;
 						}
 					}
 					else {
-						// make thumbnail_Folder
-						
+						// make thumbnail_Folder		
+						f.mkdirs();						
+						IView.thumbroot.add(temp);
+						IView.thumbworklist.add(temp);
+						IView.thumbworked = true;
 					}
 				}
 				
@@ -116,13 +132,14 @@ public class Right_Pnl extends JPanel{
 				// because GIFImageIO has trouble in raw quality GIF Files
 				if(extension.equals("gif") || extension.equals("GIF")) {
 					
-					IView.list.add(ff[i].getAbsolutePath());
+					//IView.list.add(ff[i].getAbsolutePath());
 					
 					if(thumbexist) {
 						// Synchronization between this.Folder and thumbnail_Folder
 					}
 					else {
 						// make thumbnail_Folder
+						IView.thumbworked = true;
 						
 					}
 				}
@@ -140,21 +157,25 @@ public class Right_Pnl extends JPanel{
 	// delete data
 	public void dataRemove() {
 		data.removeAllElements();
-		IView.list.clear();
 		pic_prev.removeAll();
 		table.removeAll();
+		IView.list.clear();
+		IView.thumbroot.clear();
+		IView.thumbworklist.clear();
 		this.removeAll();
 	}	
 	
 	
 	public void treeColloapse() {
-		data.removeAllElements();
-		IView.list.clear();
-		pic_prev.removeAll();
-		table.removeAll();
+		this.dataRemove();
 		
-		this.removeAll();
 		this.add(jsp_table);
+		this.add(pnl_pic);
+	}
+	
+	public void showPic(int i) {
+		pic_prev.removeAll();
+		pic_prev.add(new PicCtrl(IView.list.get(i), IView.thumbroot.get(i)));
 		this.add(pnl_pic);
 	}
 }

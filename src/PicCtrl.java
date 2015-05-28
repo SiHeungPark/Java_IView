@@ -74,7 +74,7 @@ import javax.swing.JPanel;
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			// TODO Auto-generated method stub
-			IView_Frame.getClickSignal(ref);
+			IView_Frame.getShowSignal(ref);
 			
 		}
 		
