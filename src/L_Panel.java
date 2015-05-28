@@ -112,7 +112,16 @@ class L_Panel extends JPanel {
 	public void showPic(String str) {
 		pl.removeAll();
 		pl.setLayout(new GridLayout(1,1));
-		pl.add(new PicCtrl(str, false));
+		pl.add(new PicCtrl(str, pl.getWidth(), pl.getHeight()));
 		jsp.setRightComponent(pl);
+	}
+	
+	
+	// it Worked!!!
+	public void outputSize() {
+		pl.removeAll();
+		pl.add(new Label(pl.getWidth() + ", " + pl.getHeight()));
+		jsp.setRightComponent(pl);
+		
 	}
 }

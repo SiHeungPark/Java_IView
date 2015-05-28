@@ -1,6 +1,9 @@
 import java.awt.*;
-import java.io.File;
+import java.awt.image.*;
+import java.io.*;
+import java.util.*;
 
+import javax.imageio.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.tree.*;
@@ -17,12 +20,19 @@ import javax.swing.tree.*;
  * |   BOX   |     PICTURE PREVIEW      |
  *  ------------------------------------
  */
+
+
 class IView_Frame extends JFrame implements TreeWillExpandListener {
 	private JSplitPane jsp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 	private Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 	
+	
 	static L_Panel lpl = new L_Panel();
-	static R_Panel rpl = new R_Panel();
+	//static R_Panel rpl = new R_Panel();
+	static Right_Pnl rpl = new Right_Pnl();
+	
+	private File thumbFolder;
+	private String thumbRoot;
 	
 	public IView_Frame(String title) {
 		super(title);
@@ -53,6 +63,19 @@ class IView_Frame extends JFrame implements TreeWillExpandListener {
 	private void start() {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.getEvent();
+		this.makeFolder();
+	}
+	
+	private void makeFolder() {
+		File thumbFolder = new File("IView");
+		if(!thumbFolder.exists()) {
+			thumbFolder.mkdirs();
+		}
+		else {
+			File[] destroy = thumbFolder.listFiles();
+			for(File list : destroy) list.delete();
+		}
+		thumbRoot = new String(thumbFolder.getAbsolutePath());
 	}
 
 	@Override
@@ -62,6 +85,7 @@ class IView_Frame extends JFrame implements TreeWillExpandListener {
 		rpl.dataRemove();
 		lpl.getEvent(e);
 		File[] tmp = lpl.getFile();
+		//rpl.setTable(tmp, thumbRoot);
 		rpl.setTable(tmp);
 		long end = System.currentTimeMillis();
 		System.out.println("실행 시간 : " + (end - start) / 1000.0);
@@ -70,6 +94,8 @@ class IView_Frame extends JFrame implements TreeWillExpandListener {
 	@Override
 	public void treeWillCollapse(TreeExpansionEvent e)
 			throws ExpandVetoException {
+		rpl.treeColloapse();
+		this.repaint();
 	}
 	
 	public void getEvent() {
@@ -82,10 +108,76 @@ class IView_Frame extends JFrame implements TreeWillExpandListener {
 }
 
 
-public class IView {
+public class IView extends Thread{
+	public static ArrayList <String> thumbroot = 
+			new ArrayList <String> ();
+	public static ArrayList <String> list = 
+			new ArrayList <String> ();
+	public static boolean thumbworked = false;
+	public static boolean recursioncall = false;
+	
+	// Thread 1
+	private void main_program() {
+		IView_Frame frm = new IView_Frame("IView");
+	}
+	
+	// Thread 2
+	// check thumbnail signal(0.2sec)
+	private void thumbprocess() {
+		for(;;) {
+			try {
+				Thread.sleep(200);
+				if(thumbworked) {
+					for (int i  = 0; i < list.size() ; i++) {
+						int n = list.get(list.size() - 1).lastIndexOf(File.separator);
+						makethumbnail(list.get(i), thumbroot.get(i));
+					}
+					thumbworked = false;
+				} 
+			}catch (InterruptedException e) { }
+		}
+	}
+	
+	/* 
+	 * [[ Make Thumbnail Images ]]
+	 * store thumbnail image in .thumbnail_IView folder
+	 * and save it's AbsolutePath in thumbroot(for pic_prev)
+	 * 
+	 */
+	private void makethumbnail(String ori_path, String thumb_path) {
+		
+		File ori_name = new File(ori_path);
+		File thumb_name = new File(thumb_path);
+		
+		System.out.println(ori_path + "\n" + thumb_path + "\n");
+		
+		try {
+			BufferedImage buf_ori_img = ImageIO.read(ori_name);
+			BufferedImage buf_thumb_img = 
+					new BufferedImage(100, 100, BufferedImage.TYPE_3BYTE_BGR);
+			Graphics2D graphic = buf_thumb_img.createGraphics();
+			graphic.drawImage(buf_ori_img, 0, 0, 100,100,null);
+			ImageIO.write(buf_thumb_img,  "jpg",  thumb_name);
+		} catch (IOException e){ };
+		
+		// Recursion (if try to index another directory during make thumbnails)
+		if(recursioncall) {
+			//this.makethumbnail();
+			recursioncall = false;
+		}
+	}
+	
+	@Override
+	public void run() {
+		this.main_program();
+	}
+	
+	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		new IView_Frame("IView");
+		IView view = new IView();
+		view.start();
+		view.thumbprocess();
 	}
 }
 

@@ -15,17 +15,18 @@ import javax.swing.JPanel;
 		private String ref;
 		private int xlen, ylen;
 		
-		public PicCtrl(String str, boolean resizing) {
-			File sourceimage = new File(str);
+		public PicCtrl(String loot, String str) {
+			File sourceimage = new File(loot);
 			ref = new String(str);
 			try {
 				image = ImageIO.read(sourceimage);
 			} catch (IOException e) { }
 			
-			if(resizing) {
-				xlen = 105 * image.getWidth()/image.getHeight();
-				ylen = 105;
-			}
+			
+			xlen = 100;
+			ylen = 100;
+			
+			/*
 			else {
 				if(image.getWidth() >= image.getHeight()) {
 					xlen = 250;
@@ -33,11 +34,30 @@ import javax.swing.JPanel;
 				}
 				
 				else {
-					xlen = 250;// * image.getWidth() / image.getHeight();
+					xlen = 250 * image.getWidth() / image.getHeight();
 					ylen = 230;
 				}
 			}
+			*/
 			this.addMouseListener(this);
+		}
+		
+		public PicCtrl(String loot, int x, int y) {
+			File sourceimage = new File(loot);
+			try {
+				image = ImageIO.read(sourceimage);
+			} catch (IOException e) { }
+			
+			
+			if(image.getWidth() >= image.getHeight()) {
+				xlen = 250;
+				ylen = 230;// * image.getHeight() / image.getWidth();
+			}
+			
+			else {
+				xlen = 250 * image.getWidth() / image.getHeight();
+				ylen = 230;
+			}
 		}
 		
 		@Override
