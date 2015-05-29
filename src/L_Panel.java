@@ -81,7 +81,7 @@ class L_Panel extends JPanel {
 			int cnt = 0;
 			if(ff != null) {
 				for(int i = 0;i<ff.length;++i) {
-					if(ff[i].isDirectory()) {
+					if(ff[i].isDirectory() && ff[i].getName().equals("_thumbnail_IView") == false) {
 						DefaultMutableTreeNode tmp1 = 
 								new DefaultMutableTreeNode(ff[i].getName());
 						tmp1.add(new DefaultMutableTreeNode(""));

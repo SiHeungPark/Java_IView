@@ -116,16 +116,22 @@ public class Right_Pnl extends JPanel{
 						if(exist) {
 							IView.thumbworklist.add(temp);
 							IView.thumbroot.add(temp);
-							IView.thumbworked = true;
 						}
 					}
 					else {
 						// make thumbnail_Folder		
-						f.mkdirs();						
+						f.mkdirs();		
+						Runtime rt = Runtime.getRuntime();
+						Process proc;
+						try {
+							proc = rt.exec("attrib -s -h -r " + tmp);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
 						IView.thumbroot.add(temp);
 						IView.thumbworklist.add(temp);
-						IView.thumbworked = true;
 					}
+					IView.thumbworked = true;
 				}
 				
 				// GIF will be separate 

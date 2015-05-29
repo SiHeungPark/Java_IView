@@ -91,6 +91,12 @@ class IView_Frame extends JFrame implements TreeWillExpandListener {
 		rpl.setTable(tmp);
 		long end = System.currentTimeMillis();
 		System.out.println("실행 시간 : " + (end - start) / 1000.0);
+		while(IView.outputready == false) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e1) {  }
+		}
+		this.getShowSignal(IView.cnt);
 	}
 
 	@Override
@@ -107,8 +113,10 @@ class IView_Frame extends JFrame implements TreeWillExpandListener {
 	public static void getShowSignal(String str){
 		lpl.showPic(str);
 	}
-	public static void getShowSignal(int num) {
+	public void getShowSignal(int num) {
 		for(int i = 0 ; i < num ; i++) rpl.showPic(i);
+		this.repaint();
+		System.out.println("worked??");
 	}
 }
 
@@ -125,8 +133,8 @@ public class IView extends Thread{
 	
 	public static boolean thumbworked = false;
 	public static boolean recursioncall = false;
-	
-	private int outputready = 0;
+	public static boolean outputready = false;
+	public static int cnt;
 	
 	// Thread 1
 	private void main_program() {
@@ -138,27 +146,22 @@ public class IView extends Thread{
 	private void thumbprocess() {
 		for(;;) {
 			try {
-				Thread.sleep(200);
+				Thread.sleep(100);
 				if(thumbworked) {
 					for (int i  = 0; i < list.size() ; i++) {
 						makethumbnail(list.get(i), thumbworklist.get(i));
 						thumbworklist.set(i, "None");
 						
 						// Decide to show Preview image
-						switch (outputready) {
-							case 0:
-								for(int j = 0 ; j < 5 - thumbworklist.size()%5 ; j++) {
-									if (thumbworklist.get(i).equals("None")) outputready = 1;
-									else {
-										outputready = 0;
-										break;
-									}
-								}
+						if (outputready) ;
+						else {
+							int cnt = 0;
+							for (int j = 0 ; j < 4 && j < thumbworklist.size() ; j++)
+								if (thumbworklist.get(j).equals("None")) cnt++;
+							if (cnt == thumbworklist.size() || cnt == 5) {
+								outputready = true;
 								
-							case 1:
-								IView_Frame.getShowSignal(5 - thumbworklist.size()%5);
-								outputready = 2;
-								break;
+							}
 						}
 					}
 					thumbworked = false;
@@ -193,8 +196,6 @@ public class IView extends Thread{
 			//this.makethumbnail();
 			recursioncall = false;
 		}
-		
-		
 	}
 	
 	@Override
