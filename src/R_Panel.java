@@ -21,16 +21,20 @@ import javax.swing.*;
  */
 
 public class R_Panel extends JPanel{
-	private JPanel pic_prev = new JPanel();
+	public JPanel pic_prev = new JPanel();
 	private JSplitPane jsp = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 
 	private Vector header = new Vector();
 	private Vector data = new Vector();
 	private JTable table;
 	private JScrollPane table_jsp;
-	public JScrollPane pic_jsp;
+	private JScrollPane pic_jsp;
 	
 	private int identifier = 0;
+	
+	public ArrayList <String> list = new ArrayList <String> ();
+	public ArrayList <String> thumbroot = new ArrayList <String> ();
+	public ArrayList <String> thumbworklist = new ArrayList <String> ();
 	
 	// Constructor of R_Panel
 	public R_Panel() {
@@ -62,6 +66,7 @@ public class R_Panel extends JPanel{
 	// set informations of files to Table
 	public void setTable(File[] ff, String thumbRoot) {	
 		if(ff == null) return;
+		
 		for (int i = 0;i < ff.length;++i) {
 			if(ff[i].isFile()) {
 				Vector vc = new Vector();
@@ -71,55 +76,63 @@ public class R_Panel extends JPanel{
 				data.addElement(vc);	
 				
 				int n = ff[i].getName().lastIndexOf(".");
-				String tmp = ff[i].getName().substring(n+1);
+				String extension = ff[i].getName().substring(n+1);
 				
 				// make thumbnail image and show it
-				if(tmp.equals("jpg") || tmp.equals("JPG") || 
-					tmp.equals("png") || tmp.equals("PNG") ||
-					tmp.equals("gif") || tmp.equals("GIF") 	) {
-
-					IView.list.add(ff[i].getAbsolutePath());
+				if(extension.equals("jpg") || extension.equals("JPG") || 
+				   extension.equals("png") || extension.equals("PNG") ||
+				   extension.equals("gif") || extension.equals("GIF")) {				
 					
-					File ori_name = new File(ff[i].getAbsolutePath());
-					File thumb_name = new File(thumbRoot + IView.list.size() + "." + tmp);
 					
-		            try {
-					BufferedImage buf_ori_img = ImageIO.read(ori_name);
-		            BufferedImage buf_thumb_img = 
-		            		new BufferedImage(100, 100, BufferedImage.TYPE_3BYTE_BGR);
-		            Graphics2D graphic = buf_thumb_img.createGraphics();
-		            graphic.drawImage(buf_ori_img, 0, 0, 100, 100, null);
-					ImageIO.write(buf_thumb_img, "jpg", thumb_name);
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+					
+					list.add(ff[i].getAbsolutePath());
+					
+					String thumb_name = 
+							new String(ff[i].lastModified() + "_" + ff[i].length() + "_" + ff[i].getName());
+					String temp = thumbRoot + File.separator + thumb_name;
+										
+					// Synchronization between this.Folder and thumbnail_Folder
+					File f = new File(thumbRoot);
+					File[] thumbf = f.listFiles();
+					boolean exist = false;
+					
+					for ( int x = 0; x < thumbf.length ; ++x) {
+						if(thumbf[x].isFile()) {
+							if(thumb_name.equals(thumbf[x].getName())) {
+								thumbroot.add(thumbf[x].getAbsolutePath());
+								thumbworklist.add("None");
+								exist = true;
+								break;
+							}
+						}
 					}
-		            
-					pic_prev.add(new PicCtrl(thumb_name.toString(),IView.list.get(IView.list.size() - 1)));
-					
-					//pic_prev.add(new PicCtrl(list.get(list.size()-1), true));	
-							
+					if(!exist) {
+						thumbworklist.add(temp);
+						thumbroot.add(temp);
+					}
 				}
 			}
 		}
 		table = new JTable(data, header);
-		jsp.setLeftComponent(table_jsp);
-		jsp.setRightComponent(pic_jsp);
+		this.setJSP();
 	}
 	
 	// delete data
 	public void dataRemove() {
 		data.removeAllElements();
-		IView.list.clear();
+		list.clear();
+		thumbroot.clear();
+		thumbworklist.clear();
 		pic_prev.removeAll();
 		table.removeAll();
+		this.setJSP();
 	}
 	
 	public void treeColloapse() {
-		data.removeAllElements();
-		IView.list.clear();
-		pic_prev.removeAll();
-		table.removeAll();
+		this.dataRemove();
+	}
+	
+	public void setJSP() {
 		jsp.setLeftComponent(table_jsp);
 		jsp.setRightComponent(pic_jsp);
 	}
