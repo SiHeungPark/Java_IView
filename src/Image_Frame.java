@@ -7,18 +7,16 @@ import javax.swing.*;
 
 
 public class Image_Frame extends JFrame{
-	private BufferedImage buffer;
 	
 	public Image_Frame(String loot) {
-		try { buffer = ImageIO.read(new File(loot)); } catch (IOException e) { }
 		this.setTitle("크게 보기");
-		this.setSize(buffer.getWidth(), buffer.getHeight());
-		
 		ImageIcon ic  = new ImageIcon(loot);
 	    JLabel lbl  = new JLabel(ic);
+	    JScrollPane jsp = new JScrollPane(lbl);
 	    
-	    this.add(lbl);
+	    this.add(jsp);
 	    this.setVisible(true);
+	    this.pack();
 	    this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	}
 }
