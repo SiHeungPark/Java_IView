@@ -29,12 +29,14 @@ class Make_thumbnail implements Runnable {
 	@Override
 	public void run() {
 		for (int i  = 0; i < list.size() ; i++) {
-			makethumbnail(rpl.list.get(i), rpl.thumbworklist.get(i));
+			makethumbnail(list.get(i), thumbworklist.get(i));
 			thumbworklist.set(i, "None");
-			rpl.pic_prev.add(new Pic_Ctrl(rpl.list.get(i), rpl.thumbroot.get(i)));
+			rpl.pic_prev.add(new Pic_Ctrl(list.get(i), thumbroot.get(i)));
 		}
-		rpl.setJSP();
-		frm.repaint();
+		if (this.list.size()== rpl.list.size()) {
+			rpl.setJSP();
+			frm.repaint();
+		}
 	}
 	
 	private void makethumbnail(String ori_path, String thumb_path) {	

@@ -1,4 +1,3 @@
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -15,12 +14,10 @@ public class Image_Frame extends JFrame{
 		this.setTitle("크게 보기");
 		this.setSize(buffer.getWidth(), buffer.getHeight());
 		
-		JPanel pnl = new JPanel();
 		ImageIcon ic  = new ImageIcon(loot);
 	    JLabel lbl  = new JLabel(ic);
-	    pnl.add(lbl);
-	    pnl.setBackground(Color.black);
-	    this.add(pnl);
+	    
+	    this.add(lbl);
 	    this.setVisible(true);
 	    this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	}

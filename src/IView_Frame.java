@@ -61,7 +61,7 @@ class IView_Frame extends JFrame implements TreeWillExpandListener {
 		this.makeFolder();
 	}
 	private void makeFolder() {
-		File thumbFolder = new File("IView");
+		File thumbFolder = new File("_thumbnail_IView");
 		if(!thumbFolder.exists()) {
 			thumbFolder.mkdirs();
 		}
